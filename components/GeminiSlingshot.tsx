@@ -15,10 +15,11 @@ const FRICTION = 0.998;
 // Increased Bubble Size for better visibility
 const BUBBLE_RADIUS = 36;
 const ROW_HEIGHT = BUBBLE_RADIUS * Math.sqrt(3);
-// Layout Config: Wider spread (16 cols) and concentrated at top (6 rows)
-const GRID_COLS = 16; 
-const GRID_ROWS = 6;
+// Layout Config: Balanced spread (14 cols) and concentrated at top (4 rows)
+const GRID_COLS = 14; 
+const GRID_ROWS = 4;
 const SLINGSHOT_BOTTOM_OFFSET = 240;
+const GRID_TOP_OFFSET = 60; // Add padding from top
 
 const MAX_DRAG_DIST = 200;
 const MIN_FORCE_MULT = 0.15;
@@ -132,7 +133,7 @@ const GeminiSlingshot: React.FC = () => {
     }
 
     utterance.pitch = 1.0; // Natural pitch
-    utterance.rate = 1.0;  // Natural speed (0.9 was a bit slow for adults, but ok for kids. 1.0 feels more native)
+    utterance.rate = 1.0;  // Natural speed
     
     window.speechSynthesis.speak(utterance);
   }, [voices]);
@@ -160,7 +161,7 @@ const GeminiSlingshot: React.FC = () => {
     const xOffset = (width - (GRID_COLS * BUBBLE_RADIUS * 2)) / 2 + BUBBLE_RADIUS;
     const isOdd = row % 2 !== 0;
     const x = xOffset + col * (BUBBLE_RADIUS * 2) + (isOdd ? BUBBLE_RADIUS : 0);
-    const y = BUBBLE_RADIUS + row * ROW_HEIGHT;
+    const y = BUBBLE_RADIUS + row * ROW_HEIGHT + GRID_TOP_OFFSET;
     return { x, y };
   };
 
@@ -180,7 +181,6 @@ const GeminiSlingshot: React.FC = () => {
 
   const initGrid = useCallback((width: number) => {
     const newBubbles: Bubble[] = [];
-    // Start rows a bit lower? No, top is fine.
     for (let r = 0; r < GRID_ROWS; r++) { 
       // Ensure we fill enough columns to look "spread out"
       for (let c = 0; c < (r % 2 !== 0 ? GRID_COLS - 1 : GRID_COLS); c++) {
@@ -504,10 +504,22 @@ const GeminiSlingshot: React.FC = () => {
     const onResults = (results: any) => {
       setLoading(false);
       
-      // Responsive Resize
+      // Responsive Resize & Re-centering Logic
       if (canvas.width !== container.clientWidth || canvas.height !== container.clientHeight) {
+        const oldWidth = canvas.width;
         canvas.width = container.clientWidth;
         canvas.height = container.clientHeight;
+        
+        // Dynamic re-centering of existing elements
+        if (oldWidth > 0) {
+            const xShift = (canvas.width - oldWidth) / 2;
+            bubbles.current.forEach(b => b.x += xShift);
+            particles.current.forEach(p => p.x += xShift);
+            if (isFlying.current || isPinching.current) {
+                 ballPos.current.x += xShift;
+            }
+        }
+        
         anchorPos.current = { x: canvas.width / 2, y: canvas.height - SLINGSHOT_BOTTOM_OFFSET };
         if (!isFlying.current && !isPinching.current) {
           ballPos.current = { ...anchorPos.current };
