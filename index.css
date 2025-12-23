@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #121212;
+    touch-action: none; /* Prevent pull-to-refresh on mobile */
+    font-family: 'Roboto', sans-serif;
+}
+
+canvas {
+    touch-action: none;
+    transform: scaleX(-1); /* Mirror the canvas for natural gameplay */
+}
+
+/* Custom Scrollbar for Teacher Panel */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+::-webkit-scrollbar-thumb {
+    background: #444746;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #5e5e5e;
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Gemini Slingshot",
+  "description": "제미나이 3.0이 도와주는 한글 단어 학습 버블 슈팅 게임입니다.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
